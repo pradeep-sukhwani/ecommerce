@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 from decouple import Config, RepositoryEnv
 from django.core.exceptions import ImproperlyConfigured
@@ -91,16 +91,16 @@ WSGI_APPLICATION = 'ecommerce_backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': config("db_name", default="not_set", cast=str),
-        'USER': config("user_name", default="not_set", cast=str),
-        'PASSWORD': config("db_password", default="not_set", cast=str),
-        'HOST': config("db_host", default="not_set", cast=str),
-        'PORT': config("db_port", default="not_set", cast=str),
+        'NAME': os.environ.get('POSTGRES_DB', "not_set"),
+        'USER': os.environ.get('POSTGRES_USER', "not_set"),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', "not_set"),
+        'HOST': "db",
+        'PORT': os.environ.get('POSTGRES_PORT', 5432),
     }
 }
 
 if "not_set" in set(DATABASES['default'].values()):
-    raise ImproperlyConfigured("DATABASE is not set")
+    raise ImproperlyConfigured("Database is not set")
 
 
 # Password validation
