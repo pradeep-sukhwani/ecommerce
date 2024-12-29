@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:latest
+    image: pradeepsukhwani/postgres
     restart: always
     environment:
       - POSTGRES_DB=${DB_NAME}
@@ -10,7 +10,8 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_PORT=${DB_PORT}
   web:
-    build: .
+#    build: /Dockerfile
+    image: pradeepsukhwani/ecommerce_backend-web
     command: >
       sh -c "python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
