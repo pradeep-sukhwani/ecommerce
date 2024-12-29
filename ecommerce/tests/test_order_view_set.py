@@ -2,7 +2,7 @@ from parameterized import parameterized
 from rest_framework import status
 
 from .base_test import EcommerceTestBase
-from ..models import Order, OrderState
+from ..models import Order, OrderState, Product
 from ..utils import process_order
 
 
@@ -67,3 +67,31 @@ class OrderTestCase(EcommerceTestBase):
             self.assertIsNotNone(response.data.get('id'))
             self.assertIsNotNone(response.data.get('products'))
             self.assertEqual(response.data.get('status'), OrderState.PENDING.name)
+
+    def test_process_order_failure_processed_completed_order(self):
+        """
+        Case when we are processing the completed order
+        """
+        order_object = Order.objects.filter(status=OrderState.PENDING).first()
+        # First time Processing order
+        process_order(order_object)
+        # Processing order again
+        response = self.client.patch(path=f"{self.order_api_view_set_url}{order_object.id}/process_order/",
+                                     format='json')
+        self.assertIsNotNone(response.data.get('error'))
+        self.assertEqual(response.data.get('error'), "Order is already processed")
+
+    def test_process_order_failure_quantities_not_available(self):
+        """
+        Case when we are processing order but quantities are no longer available
+        """
+        order_object = Order.objects.filter(status=OrderState.PENDING).first()
+        # Get product id from products field
+        product_id = list(order_object.products.keys())[0]
+        # Update available stock to 0
+        Product.objects.filter(id=product_id).update(stock=0)
+        # Processing order
+        response = self.client.patch(path=f"{self.order_api_view_set_url}{order_object.id}/process_order/",
+                                     format='json')
+        self.assertFalse(response.data.get('is_success'))
+        self.assertIsNotNone(response.data.get('product_ids_quantity_mismatch'))

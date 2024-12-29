@@ -39,19 +39,7 @@ class UtilTestCase(EcommerceTestBase):
             self.assertIsNone(output_data.get("invalid_product_ids"))
             self.assertIsNone(output_data.get("product_ids_quantity_mismatch"))
 
-    @parameterized.expand([
-        [False],
-        [True],
-    ])
-    def test_process_order(self, already_processed_order):
+    def test_process_order_success(self):
         order_object = Order.objects.filter(status=OrderState.PENDING).first()
-        if already_processed_order:
-            # First time Processing order
-            process_order(order_object)
-            # Processing again
-            response = process_order(order_object)
-            self.assertIsNotNone(response.detail.get('error'))
-            self.assertEqual(response.detail.get('error'), "Order is already processed")
-        else:
-            response = process_order(order_object)
-            self.assertEqual(response.status, OrderState.COMPLETED)
+        response = process_order(order_object)
+        self.assertEqual(response.status, OrderState.COMPLETED)

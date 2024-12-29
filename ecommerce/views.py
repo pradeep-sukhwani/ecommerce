@@ -4,7 +4,7 @@ from rest_framework.response import Response
 
 from ecommerce.models import Product, Order, OrderState
 from ecommerce.serializers import ProductSerializer, OrderSerializer
-from ecommerce.utils import process_order
+from ecommerce.utils import process_order, validate_product_ids_and_quantities
 
 
 # Create your views here.
@@ -79,6 +79,11 @@ class OrderViewSet(viewsets.ModelViewSet):
         This view is used to process an existing order
         """
         order_object = self.get_object()
+        output_data = validate_product_ids_and_quantities(order_object.products)
+        if not output_data.get("is_success"):
+            return Response(output_data, status=status.HTTP_400_BAD_REQUEST)
+        if order_object.status == OrderState.COMPLETED:
+            return Response({"error": "Order is already processed"}, status=status.HTTP_400_BAD_REQUEST)
         order_object = process_order(order_object=order_object)
         serializer = self.get_serializer(order_object)
         return Response(serializer.data, status=status.HTTP_200_OK)

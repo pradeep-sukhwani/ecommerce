@@ -32,8 +32,6 @@ def validate_product_ids_and_quantities(product_quantity_mapping: dict) -> dict:
 def process_order(order_object):
     # Importing locally to avoid circular import error
     from ecommerce.models import Product, OrderState
-    if order_object.status == OrderState.COMPLETED:
-        return ValidationError({"error": "Order is already processed"})
     with transaction.atomic():
         for product_id, asked_quantity in order_object.products.items():
             Product.objects.filter(id=product_id).update(stock=F('stock') - asked_quantity)
