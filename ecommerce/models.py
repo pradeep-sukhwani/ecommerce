@@ -55,3 +55,19 @@ class Order(models.Model):
     ):
         self.full_clean()
         return super().save(*args,force_insert, force_update, using, update_fields)
+
+
+class SizeChoiceEnum(Enum):
+    MEDIUM = auto()
+    LARGE = auto()
+    SMALL = auto()
+
+class Menu(models.Model):
+    name = models.CharField(max_length=25, help_text='Name of the dish')
+    size = EnumChoiceField(SizeChoiceEnum, help_text='Size of the dish', default=SizeChoiceEnum.SMALL)
+    price = models.FloatField(help_text='Price of the dish')
+    toppings = models.ManyToManyField("Topping")
+
+class Topping(models.Model):
+    name = models.CharField(max_length=50, help_text='Name of the topping')
+

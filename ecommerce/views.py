@@ -2,8 +2,8 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from ecommerce.models import Product, Order, OrderState
-from ecommerce.serializers import ProductSerializer, OrderSerializer
+from ecommerce.models import Product, Order, OrderState, Menu
+from ecommerce.serializers import ProductSerializer, OrderSerializer, MenuSerializer
 from ecommerce.utils import process_order, validate_product_ids_and_quantities
 
 
@@ -87,3 +87,16 @@ class OrderViewSet(viewsets.ModelViewSet):
         order_object = process_order(order_object=order_object)
         serializer = self.get_serializer(order_object)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class MenuViewSet(viewsets.ModelViewSet):
+    http_method_names = ["get"]
+    queryset = Menu.objects.all()
+    lookup_url_kwarg = "name"
+    serializer_class = MenuSerializer
+
+    def get_queryset(self):
+        current_query_set = super().get_queryset()
+        if self.request.query_params:
+            return current_query_set.filter(name=self.request.query_params.get('name'))
+        return current_query_set
