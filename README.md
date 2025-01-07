@@ -1,3 +1,43 @@
+## Setup Local Environment
+1. Clone this repo
+2. Create `.env` file in the root directory and add the following
+   ```.env
+    DEBUG=True
+    ALLOWED_HOSTS=['*']
+    DB_NAME='<database_name>'
+    DB_USER_NAME='<database_user_name>'
+    DB_PASSWORD='<database_password>'
+    DB_PORT='5432'
+    SECRET_KEY='<secret key>'
+    ```
+    ```python
+    # importing the function from utils
+    from django.core.management.utils import get_random_secret_key
+
+    # generating and printing the SECRET_KEY
+    print(get_random_secret_key())
+    ```
+3. Two Ways to setup this project:
+   - Using Docker
+     - Setup [Docker](https://docs.docker.com/get-started/introduction/get-docker-desktop/)
+     - Run `docker-compose up`
+       ![docker compose command](https://github.com/user-attachments/assets/9b3c2863-957b-4868-a85c-27193736463c)
+       This output ☝️ indicates that your Docker setup is working correctly and containers are running as expected.
+
+   - Using Non Docker method
+      1. Setup Postgres
+      2. Setup Python 3.13
+      3. (Optional) Setup [Pyenv](https://github.com/pyenv/pyenv) and [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv):
+      4. (Optional) Make sure that you are using virtual-env before installing dependencies
+      5. Install the requirements and run migrate command
+         ```bash
+         pip install -r requirements.txt
+         ./manage.py migrate
+         ```
+      6. Fire up the server by running the following command
+         ```bash
+         ./manage.py runserver
+         ```
 ## API
 1. Create Product
    - API URL: `/api/product/`
